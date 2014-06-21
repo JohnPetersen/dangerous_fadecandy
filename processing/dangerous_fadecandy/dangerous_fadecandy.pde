@@ -36,10 +36,10 @@ void setup() {
   // Map an 8x8 grid of LEDs to the center of the window
   float spacing = height / 24.0;
   float offset = spacing * 4.0;
-  opc.ledGrid8x8(0, width/2 + offset, height/2 + offset, spacing, 0, false);
-  opc.ledGrid8x8(64, width/2 - offset, height/2 + offset, spacing, 0, false);
-  opc.ledGrid8x8(128, width/2 - offset, height/2 - offset, spacing, 0, false);
-  opc.ledGrid8x8(192, width/2 + offset, height/2 - offset, spacing, 0, false);
+  opc.ledGrid8x8(0, width/2 + offset, height/2 - offset, spacing, 0, false);
+  opc.ledGrid8x8(64, width/2 - offset, height/2 - offset, spacing, 0, false);
+  opc.ledGrid8x8(128, width/2 - offset, height/2 + offset, spacing, 0, false);
+  opc.ledGrid8x8(192, width/2 + offset, height/2 + offset, spacing, 0, false);
 }
 
 int sld1 = 0;
@@ -51,6 +51,8 @@ int btn3 = 0;
 int light = 0;
 int cap = 0;
 
+int imgSize = 50;
+
 int getInt(String s, int def) {
   try {
     return Integer.parseInt(s);
@@ -61,7 +63,6 @@ int getInt(String s, int def) {
 void readInput() {
   if (!serialReady) return;
   if (mySerial.available() < 62) {
-    println("Insufficent data");
     return;
   }
   String msg = mySerial.readStringUntil('\n'); // 10 == line feed
@@ -106,13 +107,24 @@ void draw() {
   background(0);
   
   readInput();
+  
+  color c = color(map(sld1, 0, 1023, 0, 255),map(sld2, 0, 1023, 0, 255),map(sld3, 0, 1023, 0, 255));
 
   // Draw the image, centered at the mouse location
-  float dotSize = height * 0.7;
+  if (btn1 == 1 && imgSize > 0) {
+    imgSize = imgSize - 1;
+  } else if (btn2 == 1 && imgSize < 100) {
+    imgSize = imgSize + 1;
+  }
+    
+  float dotSize = height * (imgSize / 100.0);
+  tint(c);
   image(dot, mouseX - dotSize/2, mouseY - dotSize/2, dotSize, dotSize);
   
   
-  fill(0,255,255);
+  
+  // print the current control values.
+  fill(c);
   // Sliders
   text("Slider 1: " + sld1, 10, height - 60);
   text("Slider 2: " + sld2, 10, height - 40);
