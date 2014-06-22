@@ -4,6 +4,8 @@ OPC opc;
 //PImage dot;
 Img dot;
 
+BBox bounds;
+
 Serial mySerial;
 boolean serialReady = false;
 
@@ -27,10 +29,6 @@ void setup() {
   if (!serialReady) {
     println("No serial port found. Good luck!");
   }
-  
-  // Load a sample image
-  //dot = loadImage("dot.png");
-  dot = new MouseImg("dot.png", 50, 50);
 
   // Connect to the local instance of fcserver
   opc = new OPC(this, "127.0.0.1", 7890);
@@ -42,6 +40,11 @@ void setup() {
   opc.ledGrid8x8(64, width/2 - offset, height/2 - offset, spacing, 0, false);
   opc.ledGrid8x8(128, width/2 - offset, height/2 + offset, spacing, 0, false);
   opc.ledGrid8x8(192, width/2 + offset, height/2 + offset, spacing, 0, false);
+  
+  int bboxSize = (int)(spacing * 16);
+  bounds = new BBox(width/2 - bboxSize/2, height/2 - bboxSize/2, bboxSize, bboxSize);
+  //dot = new MouseImg("dot.png", 50, 50);
+  dot = new BounceImg("dot.png", 80, 80, bounds);
 }
 
 int sld1 = 500;
@@ -112,7 +115,7 @@ void draw() {
   
   color c = color(map(sld1, 0, 1023, 0, 255),map(sld2, 0, 1023, 0, 255),map(sld3, 0, 1023, 0, 255));
 
-  // Draw the image, centered at the mouse location
+  // Adjust the image size based on button status.
   if (btn1 == 1 && imgSize > 0) {
     imgSize = imgSize - 1;
   } else if (btn2 == 1 && imgSize < 100) {
@@ -125,7 +128,9 @@ void draw() {
   
   dot.draw();
   
-  
+  noFill();
+  stroke(255,0,0);
+  bounds.draw();
   
   // print the current control values.
   fill(c);
@@ -142,5 +147,7 @@ void draw() {
   // Light & Capsense
   text("Light: " + light, 210, height - 60);
   text("CapSense: " + cap, 210, height - 40);
+  
+  println("{ " + mouseX + ", " + mouseY + " }");
 }
 

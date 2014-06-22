@@ -6,11 +6,12 @@ Fadecandy playground with four [Neopixel matrices](https://www.adafruit.com/prod
 TODO
 -----
 * Adjust brightness based on Danger Shield light sensor value.
+* Create input state object that is passed to all the drawn objects so they can each react to the controls in their own ways.
 * Add display modes. Cycle through the modes via button 3.
- * Bouncing ball
+ * Mouse controlled - implemented
+ * Bouncing ball - implemented
  * Rainbow tunnel - controlled by mouse
  * Rainbow tunnel - bouncing ball version
- * Mouse controlled
  * Random pixels
  * ??
   
