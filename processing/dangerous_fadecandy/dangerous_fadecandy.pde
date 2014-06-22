@@ -1,7 +1,8 @@
 import processing.serial.*;
 
 OPC opc;
-PImage dot;
+//PImage dot;
+Img dot;
 
 Serial mySerial;
 boolean serialReady = false;
@@ -28,7 +29,8 @@ void setup() {
   }
   
   // Load a sample image
-  dot = loadImage("dot.png");
+  //dot = loadImage("dot.png");
+  dot = new MouseImg("dot.png", 50, 50);
 
   // Connect to the local instance of fcserver
   opc = new OPC(this, "127.0.0.1", 7890);
@@ -42,9 +44,9 @@ void setup() {
   opc.ledGrid8x8(192, width/2 + offset, height/2 + offset, spacing, 0, false);
 }
 
-int sld1 = 0;
-int sld2 = 0;
-int sld3 = 0;
+int sld1 = 500;
+int sld2 = 500;
+int sld3 = 500;
 int btn1 = 0;
 int btn2 = 0;
 int btn3 = 0;
@@ -118,8 +120,10 @@ void draw() {
   }
     
   float dotSize = height * (imgSize / 100.0);
+  // TODO can we scale the image with some sort of transform?
   tint(c);
-  image(dot, mouseX - dotSize/2, mouseY - dotSize/2, dotSize, dotSize);
+  
+  dot.draw();
   
   
   

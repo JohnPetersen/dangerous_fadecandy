@@ -8,6 +8,9 @@ TODO
 * Adjust brightness based on Danger Shield light sensor value.
 * Add display modes. Cycle through the modes via button 3.
  * Bouncing ball
+ * Rainbow tunnel - controlled by mouse
+ * Rainbow tunnel - bouncing ball version
  * Mouse controlled
+ * Random pixels
  * ??
   
