@@ -47,8 +47,10 @@ void setup() {
   bounds = new BBox(width/2 - bboxSize/2, height/2 - bboxSize/2, bboxSize, bboxSize);
   
   // Instantiate a mouse positioned or a bouncing image.
-  //dot = new MouseImg("dot.png", 50, 50, input);
-  dot = new BounceImg("dot.png", 150, 150, bounds, input);
+  //dot = new Img("dot.png", color(128,128,128), 0, 0, 37, 29, 150, 150, bounds, input, new ConstantSpeedStrategy(),
+  //    new MouseMotionStrategy(), new RGBSliderColorStrategy(), new ButtonInputScaleStrategy());
+  dot = new Img("dot.png", color(128,128,128), 0, 0, 37, 29, 150, 150, bounds, input, new InputDrivenSpeedStrategy(),
+      new BouncingMotionStrategy(), new RGBSliderColorStrategy(), new ButtonInputScaleStrategy());
 }
 
 void draw() {
@@ -56,19 +58,15 @@ void draw() {
   
   input.update();
   
-  color c = color(map(input.getSlider1(), InputState.SLIDER_MIN, InputState.SLIDER_MAX, 0, 255),
-                  map(input.getSlider2(), InputState.SLIDER_MIN, InputState.SLIDER_MAX, 0, 255),
-                  map(input.getSlider3(), InputState.SLIDER_MIN, InputState.SLIDER_MAX, 0, 255));
-  tint(c);
-  
   dot.draw();
   
+  // Draw the bounding box
   noFill();
   stroke(255,0,0);
   bounds.draw();
   
   // print the current control values.
-  fill(c);
+  fill(color(0,255,0));
   // Sliders
   text("Slider 1: " + input.getSlider1(), 10, height - 60);
   text("Slider 2: " + input.getSlider2(), 10, height - 40);

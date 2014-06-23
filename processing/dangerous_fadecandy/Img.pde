@@ -1,42 +1,46 @@
 
 public class Img {
   private final PImage i;
-  protected int x = 0;
-  protected int y = 0;
+  protected color currentColor;
+  protected final Point currentPosition;
+  protected final Point currentSpeed;
   protected final int w;
   protected final int h;
-  protected float sizeScale = 1.0;
+  protected final Point currentScale;
+  protected final BBox bounds;
   protected final InputState input;
   
-  public Img(String imagePath, int x, int y, int w, int h, InputState input) {
-    i = loadImage(imagePath);
-    this.x = x;
-    this.y = y;
+  private SpeedStrategy speedStrat;
+  private MotionStrategy motionStrat;
+  private ColorStrategy colorStrat;
+  private ScaleStrategy scaleStrat;
+  
+  public Img(String imagePath, color c, int x, int y, int dx, int dy, int w, int h, BBox bounds, InputState input,
+      SpeedStrategy speedStrat, MotionStrategy motionStrat, ColorStrategy colorStrat, ScaleStrategy scaleStrat) {
+    this.i = loadImage(imagePath);
+    this.currentColor = c;
+    this.currentPosition = new Point(x, y);
+    this.currentSpeed = new Point(dx, dy);
     this.w = w;
     this.h = h;
+    this.currentScale = new Point(1.0, 1.0);
+    this.bounds = bounds;
     this.input = input;
-  }
-  
-  protected void updatePosition() {
-    // default image behavior is to remain in it's original position.
-  }
-  
-  protected void updateSize() {
-    // Adjust the image size based on button status.
-    if (input.isButton1() && sizeScale > 0) {
-      sizeScale -= 0.1;
-    }
-    if (input.isButton2() && sizeScale < 100.0) {
-      sizeScale += 0.1;
-    }
+    this.speedStrat = speedStrat;
+    this.motionStrat = motionStrat;
+    this.colorStrat = colorStrat;
+    this.scaleStrat = scaleStrat;
   }
   
   public void draw() {
-    updatePosition();
-    updateSize();
-    
-    float tmpWidth = this.w * this.sizeScale;
-    float tmpHeight = this.h * this.sizeScale;
-    image(i, this.x-tmpWidth/2.0, this.y-tmpHeight/2.0, tmpWidth, tmpHeight);
+    this.speedStrat.updateSpeeds(this.input, this.currentSpeed);
+    this.motionStrat.updatePosition(this.input, this.bounds, this.currentSpeed, this.currentPosition);
+    this.currentColor = this.colorStrat.updateColor(this.input, this.currentColor);
+    this.scaleStrat.updateScaleFactors(this.input, this.currentScale);
+     
+    float tmpWidth = this.w * this.currentScale.x;
+    float tmpHeight = this.h * this.currentScale.y;
+    tint(this.currentColor);
+    image(i, this.currentPosition.x-tmpWidth/2.0, this.currentPosition.y-tmpHeight/2.0, tmpWidth, tmpHeight);
   }
 }  
