@@ -47,11 +47,9 @@ void setup() {
   bounds = new BBox(width/2 - bboxSize/2, height/2 - bboxSize/2, bboxSize, bboxSize);
   
   // Instantiate a mouse positioned or a bouncing image.
-  dot = new MouseImg("dot.png", 50, 50);
-  //dot = new BounceImg("dot.png", 150, 150, bounds);
+  //dot = new MouseImg("dot.png", 50, 50, input);
+  dot = new BounceImg("dot.png", 150, 150, bounds, input);
 }
-
-int imgSize = 50;
 
 void draw() {
   background(0);
@@ -61,16 +59,6 @@ void draw() {
   color c = color(map(input.getSlider1(), InputState.SLIDER_MIN, InputState.SLIDER_MAX, 0, 255),
                   map(input.getSlider2(), InputState.SLIDER_MIN, InputState.SLIDER_MAX, 0, 255),
                   map(input.getSlider3(), InputState.SLIDER_MIN, InputState.SLIDER_MAX, 0, 255));
-
-  // Adjust the image size based on button status.
-  if (input.isButton1() && imgSize > 0) {
-    imgSize = imgSize - 1;
-  } else if (input.isButton2() && imgSize < 100) {
-    imgSize = imgSize + 1;
-  }
-    
-  float dotSize = height * (imgSize / 100.0);
-  // TODO can we scale the image with some sort of transform?
   tint(c);
   
   dot.draw();

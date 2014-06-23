@@ -11,8 +11,8 @@ public class BounceImg extends Img {
   
   private final BBox bounds;
   
-  public BounceImg(String imagePath, int w, int h, BBox bounds) {
-    super(imagePath, mouseX, mouseY, w, h);
+  public BounceImg(String imagePath, int w, int h, BBox bounds, InputState input) {
+    super(imagePath, mouseX, mouseY, w, h, input);
     this.bounds = bounds;
   }
   
