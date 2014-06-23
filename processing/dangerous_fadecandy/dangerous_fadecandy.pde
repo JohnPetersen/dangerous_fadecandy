@@ -1,7 +1,8 @@
 import processing.serial.*;
+import java.util.List;
 
 OPC opc;
-Img dot;
+List<Img> images = new ArrayList<Img>();
 
 BBox bounds;
 InputState input;
@@ -49,8 +50,14 @@ void setup() {
   // Instantiate a mouse positioned or a bouncing image.
   //dot = new Img("dot.png", color(128,128,128), 0, 0, 37, 29, 150, 150, bounds, input, new ConstantSpeedStrategy(),
   //    new MouseMotionStrategy(), new RGBSliderColorStrategy(), new ButtonInputScaleStrategy());
-  dot = new Img("dot.png", color(128,128,128), 0, 0, 37, 29, 150, 150, bounds, input, new InputDrivenSpeedStrategy(),
-      new BouncingMotionStrategy(), new RGBSliderColorStrategy(), new ButtonInputScaleStrategy());
+  //dot = new Img("trans-dot.png", color(128,128,128), 0, 0, 37, 29, 150, 150, bounds, input, new InputDrivenSpeedStrategy(),
+  //    new BouncingMotionStrategy(), new RandomColorStrategy(), new ButtonInputScaleStrategy());
+  
+  for (int i = 0; i < 10; i++) {
+    Img img = new Img("trans-dot.png", color(128,128,128), (int)(i*bboxSize/7.0), 0, (int)(79*(i+1)*noise(i)), (int)(97*noise(i)), 150, 150, bounds, input, new InputDrivenSpeedStrategy(),
+      new BouncingMotionStrategy(), new RandomColorStrategy(), new ButtonInputScaleStrategy());
+    images.add(img);
+  }
 }
 
 void draw() {
@@ -58,7 +65,9 @@ void draw() {
   
   input.update();
   
-  dot.draw();
+  for (Img img : images) {
+    img.draw();
+  }
   
   // Draw the bounding box
   noFill();

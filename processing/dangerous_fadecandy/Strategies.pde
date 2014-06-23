@@ -7,7 +7,7 @@ public class Point {
   }
 }
 
-public static final int MIN_UPDATE_INTERVAL_MS = 100;
+public static final int MIN_UPDATE_INTERVAL_MS = 50;
 
 public interface SpeedStrategy {
   /** Given a set of inputs provide the speeds in the x and y directions. */

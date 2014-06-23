@@ -12,11 +12,8 @@ Display Modes
 TODO
 -----
 * Adjust brightness based on Danger Shield light sensor value.
-* Adjust speed based on Danger Shield capacitive touch sensor.
-* Use strategies for scaling. Move scaling out of base Img class.
-* Add display modes. Cycle through the modes via button 3.
- * Rainbow tunnel - controlled by mouse
- * Rainbow tunnel - bouncing ball version
- * Random pixels
- * ??
-  
+* Fix the speed strategy, the images don't appear to slow down at the same rate.
+* Add more strategies
+ * ColorCycle - color strategy that cycles through a list of colors.
+ * LinkedMotion - a follower motion strategy that positions the image a percentage of the way to the followed image.
+* Update strategies to take constructor parameters for time intervals and other values to help differentiate the look of each image.
