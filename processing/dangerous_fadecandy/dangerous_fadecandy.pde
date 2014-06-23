@@ -1,23 +1,23 @@
 import processing.serial.*;
 
 OPC opc;
-//PImage dot;
 Img dot;
 
 BBox bounds;
-
-Serial mySerial;
-boolean serialReady = false;
+InputState input;
 
 void setup() {
   size(640, 640);
 
+  Serial serial;
+  boolean serialReady = false;
   for (String s : Serial.list()) {
     println("port: " + s);
     if (!serialReady && s.indexOf("tty") > -1 && s.indexOf("Bluetooth") == -1) {
       try {
-        mySerial = new Serial(this, s, 9600);
+        serial = new Serial(this, s, 9600);
         println("  Using port: " + s);
+        input = new SerialState(serial);
         serialReady = true;
       } catch(ArrayIndexOutOfBoundsException e) {
         println("No serial port found!");
@@ -27,7 +27,8 @@ void setup() {
     }
   }
   if (!serialReady) {
-    println("No serial port found. Good luck!");
+    println("No serial port found. Using random input.");
+    input = new RandomState(47,59,67,0.1,0.1,0.1);
   }
 
   // Connect to the local instance of fcserver
@@ -41,84 +42,30 @@ void setup() {
   opc.ledGrid8x8(128, width/2 - offset, height/2 + offset, spacing, 0, false);
   opc.ledGrid8x8(192, width/2 + offset, height/2 + offset, spacing, 0, false);
   
+  // define the bounding region
   int bboxSize = (int)(spacing * 16);
   bounds = new BBox(width/2 - bboxSize/2, height/2 - bboxSize/2, bboxSize, bboxSize);
-  //dot = new MouseImg("dot.png", 50, 50);
-  dot = new BounceImg("dot.png", 80, 80, bounds);
+  
+  // Instantiate a mouse positioned or a bouncing image.
+  dot = new MouseImg("dot.png", 50, 50);
+  //dot = new BounceImg("dot.png", 150, 150, bounds);
 }
-
-int sld1 = 500;
-int sld2 = 500;
-int sld3 = 500;
-int btn1 = 0;
-int btn2 = 0;
-int btn3 = 0;
-int light = 0;
-int cap = 0;
 
 int imgSize = 50;
-
-int getInt(String s, int def) {
-  try {
-    return Integer.parseInt(s);
-  } catch (NumberFormatException e) {
-    return def;
-  }
-}
-void readInput() {
-  if (!serialReady) return;
-  if (mySerial.available() < 62) {
-    return;
-  }
-  String msg = mySerial.readStringUntil('\n'); // 10 == line feed
-  if (msg != null) {
-    println("Parsing new message");
-    String[] data = msg.split(" ");
-    for (int i = 1; i <= data.length - 1; i++) {
-      // Parse the recieved values, but skip the first and last 
-      // elements since they're usually malformed.
-      try {
-        String s = data[i];
-        println("  parsing element " + (i) + ": " + s);
-        String[] eltData = s.split(":");
-        if (s.startsWith("S")) {
-          // Parse slider data
-          String[] sldVals = eltData[1].split(",");
-          sld1 = getInt(sldVals[0], sld1);
-          sld2 = getInt(sldVals[1], sld2);
-          sld3 = getInt(sldVals[2], sld3);
-        } else if (s.startsWith("B")) {
-          // Parse button data
-          String[] btnVals = eltData[1].split(",");
-          btn1 = getInt(btnVals[0], btn1);
-          btn2 = getInt(btnVals[1], btn2);
-          btn3 = getInt(btnVals[2], btn3);
-        } else if (s.startsWith("L")) {
-          // Parse light data
-          light = getInt(eltData[1], light);
-        } else if (s.startsWith("C")) {
-          // Parse cap sense data
-          cap = getInt(eltData[1], cap);
-        } else {
-          println("  Unknown data element: " + s);
-        }
-      } catch (ArrayIndexOutOfBoundsException e) {
-      }
-    }
-  }
-}
 
 void draw() {
   background(0);
   
-  readInput();
+  input.update();
   
-  color c = color(map(sld1, 0, 1023, 0, 255),map(sld2, 0, 1023, 0, 255),map(sld3, 0, 1023, 0, 255));
+  color c = color(map(input.getSlider1(), InputState.SLIDER_MIN, InputState.SLIDER_MAX, 0, 255),
+                  map(input.getSlider2(), InputState.SLIDER_MIN, InputState.SLIDER_MAX, 0, 255),
+                  map(input.getSlider3(), InputState.SLIDER_MIN, InputState.SLIDER_MAX, 0, 255));
 
   // Adjust the image size based on button status.
-  if (btn1 == 1 && imgSize > 0) {
+  if (input.isButton1() && imgSize > 0) {
     imgSize = imgSize - 1;
-  } else if (btn2 == 1 && imgSize < 100) {
+  } else if (input.isButton2() && imgSize < 100) {
     imgSize = imgSize + 1;
   }
     
@@ -135,19 +82,18 @@ void draw() {
   // print the current control values.
   fill(c);
   // Sliders
-  text("Slider 1: " + sld1, 10, height - 60);
-  text("Slider 2: " + sld2, 10, height - 40);
-  text("Slider 3: " + sld3, 10, height - 20);
+  text("Slider 1: " + input.getSlider1(), 10, height - 60);
+  text("Slider 2: " + input.getSlider2(), 10, height - 40);
+  text("Slider 3: " + input.getSlider3(), 10, height - 20);
   
   // Buttons
-  text("Button 1: " + btn1, 110, height - 60);
-  text("Button 2: " + btn2, 110, height - 40);
-  text("Button 3: " + btn3, 110, height - 20);
+  text("Button 1: " + input.isButton1(), 110, height - 60);
+  text("Button 2: " + input.isButton2(), 110, height - 40);
+  text("Button 3: " + input.isButton3(), 110, height - 20);
   
   // Light & Capsense
-  text("Light: " + light, 210, height - 60);
-  text("CapSense: " + cap, 210, height - 40);
-  
-  println("{ " + mouseX + ", " + mouseY + " }");
+  text("Light: " + input.getLight(), 210, height - 60);
+  text("CapSense: " + input.getCapSense(), 210, height - 40);
+  text("FPS: " + frameRate, 210, height - 20);
 }
 

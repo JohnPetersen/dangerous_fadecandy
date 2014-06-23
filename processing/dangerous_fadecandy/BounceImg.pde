@@ -6,7 +6,6 @@ public class BounceImg extends Img {
   private static final int MIN_SPEED = 0;
   
   // Speeds must never exceed the dimentions of the bounding area.
-  private int speed = 50;
   private int speedX = 13;
   private int speedY = 19;
   
@@ -15,17 +14,6 @@ public class BounceImg extends Img {
   public BounceImg(String imagePath, int w, int h, BBox bounds) {
     super(imagePath, mouseX, mouseY, w, h);
     this.bounds = bounds;
-  }
-
-  public void increaseSpeed() {
-    if (this.speed < MAX_SPEED) {
-      this.speed += 10;
-    }
-  }
-  public void decreaseSpeed() {
-    if (this.speed > MIN_SPEED) {
-      this.speed -= 10;
-    }
   }
   
   protected void updatePosition() {
