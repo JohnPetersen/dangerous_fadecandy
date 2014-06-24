@@ -37,3 +37,43 @@ public class BouncingMotionStrategy implements MotionStrategy {
     currentPosition.y = newY;
   }
 }
+
+public class FollowerMotionStrategy implements MotionStrategy {
+  private final Img leader;
+  public FollowerMotionStrategy(Img leader) {
+    this.leader = leader;
+  }
+  public void updatePosition(InputState input, BBox bounds, Point currentSpeeds, Point currentPosition) {
+    float followDistance = leader.w * leader.currentScale.x / 2.0;
+    float dx = leader.currentPosition.x - currentPosition.x;
+    float dy = leader.currentPosition.y - currentPosition.y;
+    float distanceToLeader = sqrt(sq(dx) + sq(dy));
+    float heading = atan2(dy, dx);
+    currentPosition.x += (distanceToLeader - followDistance) * cos(heading);
+    currentPosition.y += (distanceToLeader - followDistance) * sin(heading);
+  }
+}
+
+public class OrbitalMotionStrategy implements MotionStrategy {
+  private float theta;
+  private final float thetaStep;
+  private final Img leader;
+  public OrbitalMotionStrategy(Img leader, float thetaStep, float initialTheta) {
+    this.leader = leader;
+    this.thetaStep = thetaStep;
+    this.theta = initialTheta;
+  }
+  public OrbitalMotionStrategy(Img leader, float thetaStep) {
+    this(leader, thetaStep, 0.0);
+  }
+  public OrbitalMotionStrategy(Img leader) {
+    this(leader, 0.1);
+  }
+  public void updatePosition(InputState input, BBox bounds, Point currentSpeeds, Point currentPosition) {
+    float radius = leader.w * leader.currentScale.x / 2.0;
+    theta = (theta + thetaStep) % TWO_PI;
+    currentPosition.x = leader.currentPosition.x + cos(theta) * radius;
+    currentPosition.y = leader.currentPosition.y + sin(theta) * radius;
+  }
+}
+

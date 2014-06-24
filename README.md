@@ -7,13 +7,13 @@ Display Modes
 -------------
 * Mouse controlled
 * Bouncing ball
+* Follower and Orbital linked-motion types
 
 
 TODO
 -----
-* Adjust brightness based on Danger Shield light sensor value.
 * Fix the speed strategy, the images don't appear to slow down at the same rate.
 * Add more strategies
  * ColorCycle - color strategy that cycles through a list of colors.
- * LinkedMotion - a follower motion strategy that positions the image a percentage of the way to the followed image.
 * Update strategies to take constructor parameters for time intervals and other values to help differentiate the look of each image.
+* Create a state input class for keyboard control so the Danger Shield is not required

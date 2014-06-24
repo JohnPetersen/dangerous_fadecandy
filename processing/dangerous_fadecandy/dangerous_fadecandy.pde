@@ -47,23 +47,49 @@ void setup() {
   int bboxSize = (int)(spacing * 16);
   bounds = new BBox(width/2 - bboxSize/2, height/2 - bboxSize/2, bboxSize, bboxSize);
   
-  // Instantiate a mouse positioned or a bouncing image.
-  //dot = new Img("dot.png", color(128,128,128), 0, 0, 37, 29, 150, 150, bounds, input, new ConstantSpeedStrategy(),
-  //    new MouseMotionStrategy(), new RGBSliderColorStrategy(), new ButtonInputScaleStrategy());
-  //dot = new Img("trans-dot.png", color(128,128,128), 0, 0, 37, 29, 150, 150, bounds, input, new InputDrivenSpeedStrategy(),
-  //    new BouncingMotionStrategy(), new RandomColorStrategy(), new ButtonInputScaleStrategy());
-  
-  for (int i = 0; i < 10; i++) {
-    Img img = new Img("trans-dot.png", color(128,128,128), (int)(i*bboxSize/7.0), 0, (int)(79*(i+1)*noise(i)), (int)(97*noise(i)), 150, 150, bounds, input, new InputDrivenSpeedStrategy(),
-      new BouncingMotionStrategy(), new RandomColorStrategy(), new ButtonInputScaleStrategy());
+  // Three bouncing dots.
+  int numberOfDots = 3;
+  ColorStrategy colorStrat = new RandomColorStrategy();
+  ScaleStrategy scaleStrat = new ButtonInputScaleStrategy();
+  for (int i = 0; i < numberOfDots; i++) {
+    Img img = new Img("trans-dot.png", color(128,128,128), (int)(i*bboxSize/7.0), 0, (int)(7*(i+1)*noise(i)), (int)(13*noise(i)), 150, 150, bounds, input, 
+      new InputDrivenSpeedStrategy(), new BouncingMotionStrategy(), colorStrat, scaleStrat);
     images.add(img);
   }
+  
+  // One bouncer with a simi-random color and a tail of orbiters.
+  Img img = new Img("trans-dot.png", color(255,128,128), 0, 0, 13, 7, 100, 100, bounds, input, 
+      new ConstantSpeedStrategy(), new BouncingMotionStrategy(), new RandomColorStrategy(-1, -1, 255), scaleStrat);
+  images.add(img);
+  for (int i = 0; i < 3; i++) {
+    img = new Img("trans-dot.png", color(128,255,128), 0, 0, 0, 0, 90-i*15, 90-i*15, bounds, input, 
+        new ConstantSpeedStrategy(), new OrbitalMotionStrategy(img, noise(i)), colorStrat, scaleStrat);
+    images.add(img);
+  }
+  
+  // A mouse controlled dot with three orbiters.
+  Img center = new Img("trans-dot.png", color(255,255,255), 0, 0, 0, 0, 150, 150, bounds, input, 
+      new ConstantSpeedStrategy(), new MouseMotionStrategy(), new SingleSliderColorStrategy(2), scaleStrat);
+  images.add(center);
+  img = new Img("trans-dot.png", color(255,0,0), 0, 0, 0, 0, 80, 80, bounds, input, 
+        new ConstantSpeedStrategy(), new OrbitalMotionStrategy(center, 0.05, 0.0), new ConstantColorStrategy(), scaleStrat);
+  images.add(img);
+  img = new Img("trans-dot.png", color(0,255,0), 0, 0, 0, 0, 80, 80, bounds, input, 
+        new ConstantSpeedStrategy(), new OrbitalMotionStrategy(center, 0.05, TWO_PI/3.0), new ConstantColorStrategy(), scaleStrat);
+  images.add(img);
+  img = new Img("trans-dot.png", color(0,0,255), 0, 0, 0, 0, 100, 100, bounds, input, 
+        new ConstantSpeedStrategy(), new OrbitalMotionStrategy(center, 0.05, TWO_PI*2/3.0), new ConstantColorStrategy(), scaleStrat);
+  images.add(img);
 }
 
 void draw() {
   background(0);
   
   input.update();
+  
+  // Adjust brightness
+  float gamma = map(input.getLight(), 0, 1023, 3.5, 0.5);
+  opc.setColorCorrection(gamma, 1.0, 1.0, 1.0);
   
   for (Img img : images) {
     img.draw();
@@ -90,5 +116,10 @@ void draw() {
   text("Light: " + input.getLight(), 210, height - 60);
   text("CapSense: " + input.getCapSense(), 210, height - 40);
   text("FPS: " + frameRate, 210, height - 20);
+}
+
+void exit() {
+  background(0);
+  super.exit();
 }
 
